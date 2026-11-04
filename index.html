@@ -512,20 +512,39 @@ function loop() {
 }
 
 /* ---------- câmera ---------- */
-async function startCamera() {
+let cams = [], camIndex = -1;
+async function openStream(video) {
   if (stream) stream.getTracks().forEach(t => t.stop());
-  stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
-  });
+  stream = null; els.video.srcObject = null;
+  stream = await navigator.mediaDevices.getUserMedia({ audio: false, video });
   els.video.srcObject = stream;
   await els.video.play();
-  els.stage.classList.toggle("mirror", facing === "user");
-  lastVideoTime = -1;
+  const track = stream.getVideoTracks()[0], st = track.getSettings ? track.getSettings() : {};
+  // espelha só a câmera da frente (a traseira mostra a cena como ela é)
+  const label = (track.label || "").toLowerCase();
+  const isBack = st.facingMode ? st.facingMode === "environment" : /back|rear|traseira|environment/.test(label);
+  facing = isBack ? "environment" : "user";
+  els.stage.classList.toggle("mirror", !isBack);
+  lastVideoTime = -1; smooth = null; hold.cand = null;
   try {
-    const cams = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "videoinput");
+    cams = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "videoinput");
+    camIndex = cams.findIndex(c => c.deviceId && c.deviceId === st.deviceId);
     $("flip").classList.toggle("hidden", cams.length < 2);
   } catch {}
+}
+const size = { width: { ideal: 1280 }, height: { ideal: 720 } };
+async function startCamera() {
+  await openStream({ facingMode: facing, ...size });
+}
+async function nextCamera() {
+  const want = facing === "user" ? "environment" : "user";
+  // 1º tenta exigir o lado certo; se o aparelho não aceitar, passa para a próxima câmera da lista
+  try { await openStream({ facingMode: { exact: want }, ...size }); if (facing === want) return; } catch {}
+  if (cams.length > 1) {
+    const next = cams[(camIndex + 1 + cams.length) % cams.length];
+    await openStream({ deviceId: { exact: next.deviceId }, ...size });
+  }
+  if (!stream) throw new Error("sem câmera");
 }
 
 els.start.addEventListener("click", async () => {
@@ -551,8 +570,10 @@ els.start.addEventListener("click", async () => {
   }
 });
 $("flip").addEventListener("click", async () => {
-  facing = facing === "user" ? "environment" : "user";
-  try { await startCamera(); } catch { facing = facing === "user" ? "environment" : "user"; toast("Não deu para trocar"); }
+  const btn = $("flip"); btn.disabled = true;
+  try { await nextCamera(); toast(facing === "user" ? "Câmera da frente" : "Câmera traseira"); }
+  catch (e) { console.warn(e); toast("Não deu para trocar"); try { await startCamera(); } catch {} }
+  btn.disabled = false;
 });
 
 /* ---------- botões ---------- */
