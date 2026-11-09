@@ -1,5 +1,6 @@
 [
   {
+    "id": "pbc_soletra_gestures",
     "name": "gestures",
     "type": "base",
     "system": false,
@@ -10,6 +11,7 @@
     "deleteRule": "owner = @request.auth.id",
     "fields": [
       {
+        "id": "relation_owner",
         "name": "owner",
         "type": "relation",
         "required": true,
@@ -18,15 +20,75 @@
         "minSelect": 0,
         "maxSelect": 1
       },
-      { "name": "label", "type": "text", "required": true, "min": 1, "max": 40 },
-      { "name": "kind", "type": "select", "required": true, "maxSelect": 1, "values": ["letra", "palavra", "comando"] },
-      { "name": "alphabet", "type": "select", "required": true, "maxSelect": 1, "values": ["libras", "asl"] },
-      { "name": "samples", "type": "json", "required": true, "maxSize": 2000000 },
-      { "name": "public", "type": "bool" },
-      { "name": "author_name", "type": "text", "max": 60 },
-      { "name": "source", "type": "text", "max": 30 },
-      { "name": "created", "type": "autodate", "onCreate": true, "onUpdate": false },
-      { "name": "updated", "type": "autodate", "onCreate": true, "onUpdate": true }
+      {
+        "id": "text_label",
+        "name": "label",
+        "type": "text",
+        "required": true,
+        "min": 1,
+        "max": 40
+      },
+      {
+        "id": "select_kind",
+        "name": "kind",
+        "type": "select",
+        "required": true,
+        "maxSelect": 1,
+        "values": [
+          "letra",
+          "palavra",
+          "comando"
+        ]
+      },
+      {
+        "id": "select_alphabet",
+        "name": "alphabet",
+        "type": "select",
+        "required": true,
+        "maxSelect": 1,
+        "values": [
+          "libras",
+          "asl"
+        ]
+      },
+      {
+        "id": "json_samples",
+        "name": "samples",
+        "type": "json",
+        "required": true,
+        "maxSize": 2000000
+      },
+      {
+        "id": "bool_public",
+        "name": "public",
+        "type": "bool"
+      },
+      {
+        "id": "text_author_name",
+        "name": "author_name",
+        "type": "text",
+        "max": 60
+      },
+      {
+        "id": "text_source",
+        "name": "source",
+        "type": "text",
+        "max": 30
+      },
+      {
+        "id": "autodate_created",
+        "name": "created",
+        "type": "autodate",
+        "onCreate": true,
+        "onUpdate": false
+      },
+      {
+        "id": "autodate_updated",
+        "name": "updated",
+        "type": "autodate",
+        "onCreate": true,
+        "onUpdate": true
+      }
     ],
     "indexes": [
       "CREATE INDEX `idx_gestures_owner` ON `gestures` (`owner`)",
