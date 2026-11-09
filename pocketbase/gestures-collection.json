@@ -1,0 +1,36 @@
+[
+  {
+    "name": "gestures",
+    "type": "base",
+    "system": false,
+    "listRule": "owner = @request.auth.id || public = true",
+    "viewRule": "owner = @request.auth.id || public = true",
+    "createRule": "@request.auth.id != \"\" && owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id && (@request.body.owner:isset = false || @request.body.owner = @request.auth.id)",
+    "deleteRule": "owner = @request.auth.id",
+    "fields": [
+      {
+        "name": "owner",
+        "type": "relation",
+        "required": true,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": true,
+        "minSelect": 0,
+        "maxSelect": 1
+      },
+      { "name": "label", "type": "text", "required": true, "min": 1, "max": 40 },
+      { "name": "kind", "type": "select", "required": true, "maxSelect": 1, "values": ["letra", "palavra", "comando"] },
+      { "name": "alphabet", "type": "select", "required": true, "maxSelect": 1, "values": ["libras", "asl"] },
+      { "name": "samples", "type": "json", "required": true, "maxSize": 2000000 },
+      { "name": "public", "type": "bool" },
+      { "name": "author_name", "type": "text", "max": 60 },
+      { "name": "source", "type": "text", "max": 30 },
+      { "name": "created", "type": "autodate", "onCreate": true, "onUpdate": false },
+      { "name": "updated", "type": "autodate", "onCreate": true, "onUpdate": true }
+    ],
+    "indexes": [
+      "CREATE INDEX `idx_gestures_owner` ON `gestures` (`owner`)",
+      "CREATE INDEX `idx_gestures_public` ON `gestures` (`public`, `alphabet`)"
+    ]
+  }
+]

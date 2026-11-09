@@ -166,6 +166,29 @@
   .sheet.tall{max-height:62vh;max-height:62dvh;overflow:auto}
   .sheet p.note{color:var(--muted);font-size:13px;line-height:1.45;margin:-8px 0 10px}
 
+  /* conta, palavras, comunidade */
+  .iconbtn.acct{position:relative}
+  .iconbtn.acct.on::after{content:"";position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .sub{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px}
+  .words{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .wchip{height:38px;padding:0 14px;border-radius:999px;background:var(--surface-2);border:1px solid rgba(198,244,50,.5);font:600 14px Inter,sans-serif}
+  .wchip.pub{background:#1C2110}
+  .empty{color:var(--muted);font-size:13.5px}
+  .input{width:100%;height:50px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--text);
+    padding:0 14px;font:500 16px Inter,sans-serif;outline:none}
+  .input:focus{border-color:var(--accent)}
+  .inline{display:flex;gap:8px}
+  .inline .btn{flex:none;padding:0 18px;height:50px}
+  .stack{display:flex;flex-direction:column;gap:10px}
+  .errmsg{color:var(--danger);font-size:13.5px;margin:0}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line)}
+  .item b{font:700 18px "Space Grotesk",sans-serif;display:block}
+  .item small{color:var(--muted);font-size:12.5px}
+  .item .btn{height:40px;padding:0 14px;font-size:13.5px;flex:none}
+  .item .btn.add{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .btn[disabled]{opacity:.55}
+
   .hidden{display:none!important}
   .fade{opacity:0}
 
@@ -208,6 +231,9 @@
         </button>
         <button class="iconbtn hidden" id="openTrain" aria-label="Treinar letras">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>
+        </button>
+        <button class="iconbtn acct" id="accountBtn" aria-label="Conta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.4-3 4-4.5 7-4.5s5.6 1.5 7 4.5"/></svg>
         </button>
         <button class="iconbtn" id="openSettings" aria-label="Ajustes">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
@@ -297,15 +323,67 @@
 
 <div class="sheet tall" id="trainSheet" role="dialog" aria-modal="true" aria-labelledby="trainTitle">
   <div class="grab"></div>
-  <h2 id="trainTitle">Treinar Libras</h2>
-  <p class="note" id="trainNote">Toque numa letra, faça o sinal e mexa a mão de leve enquanto ele grava (uns 3 s). Grave pelo menos 2 letras.</p>
+  <h2 id="trainTitle">Meus gestos</h2>
+  <p class="note" id="trainNote"></p>
+  <div class="sub">Alfabeto</div>
   <div class="grid" id="grid"></div>
-  <div class="row2">
+  <div class="sub">Palavras</div>
+  <div class="words" id="words"></div>
+  <form class="inline" id="newWordForm" autocomplete="off">
+    <input class="input" id="newWord" maxlength="30" placeholder="Nova palavra, ex.: OI" aria-label="Nome da palavra">
+    <button class="btn" type="submit">Gravar</button>
+  </form>
+  <button class="btn" id="openExplore" style="width:100%;margin-top:12px">Explorar gestos da comunidade</button>
+  <div class="row2" style="margin-top:10px">
     <button class="btn" id="exportData">Exportar</button>
     <label class="btn" style="cursor:pointer">Importar<input type="file" id="importData" accept="application/json" hidden></label>
     <button class="btn" id="wipeData">Apagar tudo</button>
   </div>
   <button class="btn primary" id="closeTrain" style="width:100%;margin-top:10px">Começar a escrever</button>
+</div>
+
+<div class="sheet" id="itemSheet" role="dialog" aria-modal="true" aria-labelledby="itemTitle">
+  <div class="grab"></div>
+  <h2 id="itemTitle"></h2>
+  <p class="note" id="itemNote"></p>
+  <div class="field" id="itemPublicRow">
+    <label class="switch"><span><b style="font-weight:600">Público</b><small>Outras pessoas podem ver e adicionar este gesto.</small></span><input type="checkbox" id="itemPublic"></label>
+  </div>
+  <div class="row2" style="margin-top:6px">
+    <button class="btn" id="itemRedo">Regravar</button>
+    <button class="btn" id="itemDelete">Apagar</button>
+  </div>
+  <button class="btn primary" id="itemClose" style="width:100%;margin-top:10px">Pronto</button>
+</div>
+
+<div class="sheet tall" id="exploreSheet" role="dialog" aria-modal="true" aria-labelledby="exploreTitle">
+  <div class="grab"></div>
+  <h2 id="exploreTitle">Comunidade</h2>
+  <p class="note">Gestos que outras pessoas deixaram públicos. Ao adicionar, uma cópia vai para a sua conta.</p>
+  <input class="input" id="exploreQ" placeholder="Buscar por letra ou palavra" autocomplete="off">
+  <div class="list" id="exploreList"></div>
+  <button class="btn primary" id="exploreClose" style="width:100%;margin-top:10px">Voltar</button>
+</div>
+
+<div class="sheet" id="accountSheet" role="dialog" aria-modal="true" aria-labelledby="accTitle">
+  <div class="grab"></div>
+  <h2 id="accTitle">Entrar</h2>
+  <div id="accOut">
+    <form id="authForm" class="stack">
+      <input class="input hidden" id="authName" placeholder="Seu nome (aparece nos gestos públicos)" autocomplete="name" maxlength="60">
+      <input class="input" id="authEmail" type="email" placeholder="E-mail" autocomplete="email" required>
+      <input class="input" id="authPass" type="password" placeholder="Senha (mínimo 8 caracteres)" minlength="8" autocomplete="current-password" required>
+      <p class="errmsg hidden" id="authErr"></p>
+      <button class="btn primary" type="submit" id="authSubmit" style="width:100%">Entrar</button>
+    </form>
+    <button class="btn ghost" id="authToggle" style="width:100%">Não tem conta? Criar conta</button>
+  </div>
+  <div id="accIn" class="hidden stack">
+    <p class="note" id="accInfo" style="margin:0"></p>
+    <button class="btn" id="syncNow" style="width:100%">Sincronizar agora</button>
+    <button class="btn" id="logout" style="width:100%">Sair</button>
+  </div>
+  <p class="note" style="margin:14px 0 0">Dos gestos, guardamos só os pontos da mão, nunca imagem ou vídeo.</p>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -392,6 +470,11 @@ function render() {
 function addChar(c) {
   text += c; lastAdded = text.length - 1; render();
 }
+function commitLabel(l) {
+  if ([...l].length === 1) return addChar(l);
+  if (text && !text.endsWith(" ")) text += " ";
+  text += l + " "; lastAdded = -1; render();
+}
 function addSpace() { if (text && !text.endsWith(" ")) { text += " "; lastAdded = -1; render(); } }
 function backspace() { text = text.slice(0, -1); lastAdded = -1; render(); }
 
@@ -444,7 +527,7 @@ function onPrediction(labels, probs, now) {
   setStatus(repeat ? `Segure para repetir ${hold.cand}` : `Lendo ${hold.cand} · ${Math.round(conf * 100)}%`);
 
   if (p >= 1) {
-    addChar(hold.cand);
+    commitLabel(hold.cand);
     hold.lastCommit = hold.cand; hold.released = false; hold.since = now; hold.spaced = false;
     els.chip.classList.remove("pop"); void els.chip.offsetWidth; els.chip.classList.add("pop");
     try { navigator.vibrate && navigator.vibrate(25); } catch {}
@@ -610,27 +693,54 @@ $("conf").addEventListener("input", e => { settings.conf = +e.target.value; sync
 $("autoSpace").addEventListener("change", e => { settings.autoSpace = e.target.checked; saveSettings(); });
 $("showTop").addEventListener("change", e => { settings.showTop = e.target.checked; syncSettingsUI(); saveSettings(); });
 
-/* ---------- ASL x Libras ---------- */
+/* ---------- ASL x Libras, gestos e conta ---------- */
+const PB_URL = "https://pocketbase-hu5bjmr7jjsmmja9rq8y76a2.5.161.248.230.sslip.io";
+const PB_SDK = "https://cdn.jsdelivr.net/npm/pocketbase@0.28.2/dist/pocketbase.es.mjs";
 let curLabels = LABELS;
 let lang = null;
 try { lang = localStorage.getItem("soletra-lang"); } catch {}
 const LIBRAS_LETTERS = "ABCÇDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const SAMPLES_PER_LETTER = 30, MIN_SAMPLES = 10;
-let samples = {};
-try { samples = JSON.parse(localStorage.getItem("soletra-libras") || "{}"); } catch {}
-const saveSamples = () => {
-  try { localStorage.setItem("soletra-libras", JSON.stringify(samples)); }
-  catch { toast("Memória cheia: exporte e apague algumas letras"); }
-};
-const mirrorFeat = f => f.map((v, i) => (i % 2 === 0 ? -v : v)); // mesma letra feita com a outra mão
+const mirrorFeat = f => f.map((v, i) => (i % 2 === 0 ? -v : v)); // mesma forma feita com a outra mão
 const round = f => Array.from(f, v => Math.round(v * 1000) / 1000);
+const isWord = l => [...l].length > 1;
+const isOwn = g => !g.source;
+const cleanLabel = s => s.trim().replace(/\s+/g, " ").toUpperCase();
 
-// Libras: k vizinhos mais próximos sobre os mesmos 42 números da mão
+/* Cada gesto: { id (no servidor), label, kind, public, source (id do original, se copiado), samples, dirty } */
+let gestures = [];
+let pb = null;
+const user = () => (pb && pb.authStore.isValid ? pb.authStore.record : null);
+const cacheKey = uid => "soletra-gestures-" + (uid || "anon");
+function newGesture(label, samples, extra = {}) {
+  return { id: null, label, kind: isWord(label) ? "palavra" : "letra", public: false, source: "", samples, dirty: true, ...extra };
+}
+function readCache(uid) {
+  try { const v = JSON.parse(localStorage.getItem(cacheKey(uid)) || "null"); if (Array.isArray(v)) return v; } catch {}
+  if (!uid) { // migra o treino da versão anterior
+    try {
+      const old = JSON.parse(localStorage.getItem("soletra-libras") || "{}");
+      return Object.entries(old).map(([l, s]) => newGesture(l, s));
+    } catch {}
+  }
+  return [];
+}
+function saveCache() {
+  try { localStorage.setItem(cacheKey(user()?.id), JSON.stringify(gestures)); }
+  catch { toast("Memória cheia: apague alguns gestos"); }
+}
+
+/* k vizinhos mais próximos sobre os 42 números da mão */
 let knnLabels = [], knnSet = [];
 function rebuildKnn() {
-  knnLabels = LIBRAS_LETTERS.filter(l => (samples[l] || []).length >= MIN_SAMPLES);
-  knnSet = [];
-  knnLabels.forEach((l, li) => samples[l].forEach(f => { knnSet.push([li, f]); knnSet.push([li, mirrorFeat(f)]); }));
+  const by = new Map();
+  for (const g of gestures) {
+    if ((g.samples || []).length < MIN_SAMPLES) continue;
+    if (!by.has(g.label)) by.set(g.label, []);
+    by.get(g.label).push(...g.samples);
+  }
+  knnLabels = [...by.keys()]; knnSet = [];
+  knnLabels.forEach((l, li) => by.get(l).forEach(f => { knnSet.push([li, f]); knnSet.push([li, mirrorFeat(f)]); }));
 }
 function knn(feat, k = 7) {
   const best = [];
@@ -643,47 +753,162 @@ function knn(feat, k = 7) {
   const probs = new Array(knnLabels.length).fill(0);
   let tot = 0;
   for (const [d, li] of best) { const w = 1 / (d + 0.05); probs[li] += w; tot += w; }
-  // longe de tudo que foi gravado = pouca confiança
   const near = Math.exp(-Math.max(0, best[0][0] - 0.5) * 2);
   return probs.map(p => (p / tot) * near);
 }
 
 function handleHand(feat, now) {
-  if (rec.letter) return recordFrame(feat, now);
+  if (rec.label) return recordFrame(feat, now);
   if (lang === "libras") {
-    if (knnLabels.length < 2) { setRing(0); showLetter("✋", true); renderTop3([]); setStatus("Treine pelo menos 2 letras"); return; }
+    if (knnLabels.length < 2) { setRing(0); showLetter("✋", true); renderTop3([]); setStatus("Treine pelo menos 2 gestos"); return; }
     return onPrediction(knnLabels, knn(feat), now);
   }
   onPrediction(LABELS, classify(feat), now);
 }
 
-/* gravação de exemplos */
-const rec = { letter: null, startAt: 0, last: 0, buf: [] };
-function startRecording(letter) {
-  rec.letter = letter; rec.startAt = performance.now() + 1500; rec.buf = []; rec.last = 0;
+/* ---------- gravação ---------- */
+const rec = { label: null, startAt: 0, last: 0, buf: [] };
+function startRecording(label) {
+  rec.label = label; rec.startAt = performance.now() + 1500; rec.buf = []; rec.last = 0;
   closeAll();
-  showLetter(letter, false); setRing(0);
-  setStatus(`Prepare a letra ${letter}…`);
+  showLetter(isWord(label) ? "●" : label, false); setRing(0);
+  setStatus(`Prepare: ${label}…`);
 }
 function recordFrame(feat, now) {
-  if (now < rec.startAt) { setStatus(`Prepare a letra ${rec.letter}…`); return; }
+  if (now < rec.startAt) { setStatus(`Prepare: ${rec.label}…`); return; }
   if (now - rec.last < 90) return;
   rec.last = now; rec.buf.push(round(feat));
   setRing(rec.buf.length / SAMPLES_PER_LETTER);
-  setStatus(`Gravando ${rec.letter} · ${rec.buf.length}/${SAMPLES_PER_LETTER}`);
+  setStatus(`Gravando ${rec.label} · ${rec.buf.length}/${SAMPLES_PER_LETTER}`);
   if (rec.buf.length >= SAMPLES_PER_LETTER) {
-    samples[rec.letter] = rec.buf; saveSamples(); rebuildKnn();
-    const l = rec.letter; rec.letter = null;
+    const label = rec.label; rec.label = null;
+    let g = gestures.find(x => x.label === label && isOwn(x));
+    if (g) { g.samples = rec.buf; g.dirty = true; } else { g = newGesture(label, rec.buf); gestures.push(g); }
+    saveCache(); rebuildKnn();
     els.chip.classList.remove("pop"); void els.chip.offsetWidth; els.chip.classList.add("pop");
-    toast(`${l} aprendida`);
+    toast(`${label} aprendido`);
+    pushGesture(g);
     renderGrid(); openSheet2(trainSheet);
   }
 }
 
-/* telas de idioma e treino */
-const langSheet = $("langSheet"), trainSheet = $("trainSheet");
+/* ---------- servidor (PocketBase) ---------- */
+async function ensurePb() {
+  if (pb) return pb;
+  const { default: PocketBase } = await import(PB_SDK);
+  pb = new PocketBase(PB_URL);
+  pb.autoCancellation(false);
+  return pb;
+}
+const authorName = () => (user()?.name || "").trim() || "Anônimo";
+function toRecord(g) {
+  return { owner: user().id, label: g.label, kind: g.kind, alphabet: "libras", samples: g.samples,
+    public: !!g.public && isOwn(g), source: g.source || "", author_name: authorName() };
+}
+function fromRecord(r) {
+  return { id: r.id, label: r.label, kind: r.kind, public: !!r.public, source: r.source || "", samples: r.samples || [], dirty: false };
+}
+async function pushGesture(g) {
+  if (!user()) { updateSyncNote(); return; }
+  try {
+    const r = g.id ? await pb.collection("gestures").update(g.id, toRecord(g))
+                   : await pb.collection("gestures").create(toRecord(g));
+    g.id = r.id; g.dirty = false; saveCache();
+  } catch (e) {
+    console.warn(e);
+    if (e?.status === 404) { g.id = null; g.dirty = true; saveCache(); return pushGesture(g); }
+    toast("Sem conexão: salvo só no aparelho por enquanto");
+  }
+  updateSyncNote();
+}
+async function deleteRemote(g) {
+  if (!g.id || !user()) return;
+  try { await pb.collection("gestures").delete(g.id); } catch (e) { if (e?.status !== 404) console.warn(e); }
+}
+// Junta o que está no servidor com o que foi gravado no aparelho e ainda não subiu.
+async function sync() {
+  if (!user()) return;
+  const remote = await pb.collection("gestures").getFullList({
+    filter: pb.filter("owner = {:id} && alphabet = 'libras'", { id: user().id }), sort: "created",
+  });
+  const pending = gestures.filter(g => g.dirty || !g.id);
+  gestures = remote.map(fromRecord);
+  for (const p of pending) {
+    let target = p.id ? gestures.find(g => g.id === p.id) : null;
+    if (!target && isOwn(p)) target = gestures.find(g => g.label === p.label && isOwn(g));
+    if (!target && !isOwn(p)) target = gestures.find(g => g.source === p.source);
+    if (target) Object.assign(target, { samples: p.samples, public: p.public, dirty: true });
+    else gestures.push({ ...p, id: null, dirty: true });
+  }
+  for (const g of gestures.filter(g => g.dirty)) await pushGesture(g);
+  saveCache(); rebuildKnn(); renderGrid();
+}
+
+/* ---------- conta ---------- */
+let signup = false;
+const accountSheet = $("accountSheet");
+function updateAccountUI() {
+  const u = user();
+  $("accountBtn").classList.toggle("on", !!u);
+  $("accOut").classList.toggle("hidden", !!u);
+  $("accIn").classList.toggle("hidden", !u);
+  $("accTitle").textContent = u ? "Sua conta" : signup ? "Criar conta" : "Entrar";
+  if (u) $("accInfo").textContent = `${u.name || "Sem nome"} · ${u.email}. Seus gestos ficam salvos na conta e funcionam em qualquer aparelho.`;
+  $("authName").classList.toggle("hidden", !signup);
+  $("authSubmit").textContent = signup ? "Criar conta" : "Entrar";
+  $("authToggle").textContent = signup ? "Já tem conta? Entrar" : "Não tem conta? Criar conta";
+  $("authPass").autocomplete = signup ? "new-password" : "current-password";
+  updateSyncNote();
+}
+function authError(e) {
+  if (!e || e.status === 0) return "Não consegui falar com o servidor. Confira a internet.";
+  const d = e.response?.data || {};
+  if (signup && d.email) return "Esse e-mail já tem conta ou é inválido.";
+  if (signup && d.password) return "A senha precisa ter pelo menos 8 caracteres.";
+  if (e.status === 400) return signup ? "Confira os dados e tente de novo." : "E-mail ou senha incorretos.";
+  if (e.status === 429) return "Muitas tentativas. Espere um pouco.";
+  return "Algo deu errado. Tente de novo.";
+}
+$("accountBtn").addEventListener("click", () => { updateAccountUI(); openSheet2(accountSheet); });
+$("authToggle").addEventListener("click", () => { signup = !signup; $("authErr").classList.add("hidden"); updateAccountUI(); });
+$("authForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("authEmail").value.trim(), password = $("authPass").value, name = $("authName").value.trim();
+  const btn = $("authSubmit"); btn.disabled = true; $("authErr").classList.add("hidden");
+  try {
+    await ensurePb();
+    if (signup) await pb.collection("users").create({ email, password, passwordConfirm: password, name });
+    await pb.collection("users").authWithPassword(email, password);
+    // o que foi treinado sem conta vai para a conta
+    const anon = readCache(null);
+    gestures = [...readCache(user().id), ...anon.map(g => ({ ...g, id: null, dirty: true }))];
+    try { localStorage.removeItem(cacheKey(null)); localStorage.removeItem("soletra-libras"); } catch {}
+    $("authPass").value = "";
+    updateAccountUI(); closeAll();
+    toast(signup ? "Conta criada" : "Bem-vindo de volta");
+    await sync();
+  } catch (err) {
+    console.warn(err);
+    $("authErr").textContent = authError(err); $("authErr").classList.remove("hidden");
+  }
+  btn.disabled = false;
+});
+$("logout").addEventListener("click", () => {
+  pb.authStore.clear();
+  gestures = readCache(null); rebuildKnn(); renderGrid();
+  updateAccountUI(); closeAll(); toast("Você saiu");
+});
+$("syncNow").addEventListener("click", async () => {
+  try { await sync(); toast("Sincronizado"); } catch (e) { console.warn(e); toast("Não deu para sincronizar"); }
+});
+
+/* ---------- telas ---------- */
+const langSheet = $("langSheet"), trainSheet = $("trainSheet"), itemSheet = $("itemSheet"), exploreSheet = $("exploreSheet");
 function openSheet2(s) { closeAll(); s.classList.add("open"); sheetBg.classList.add("open"); }
-function closeAll() { [sheet, langSheet, trainSheet].forEach(s => s.classList.remove("open")); sheetBg.classList.remove("open"); }
+function closeAll() {
+  [sheet, langSheet, trainSheet, itemSheet, exploreSheet, accountSheet].forEach(s => s.classList.remove("open"));
+  sheetBg.classList.remove("open");
+}
 function syncLangUI() {
   document.querySelectorAll(".choice").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   $("langName").textContent = lang === "libras" ? "Libras" : "ASL";
@@ -705,39 +930,158 @@ document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", ()
 $("langChip").addEventListener("click", () => openSheet2(langSheet));
 $("openTrain").addEventListener("click", () => { renderGrid(); openSheet2(trainSheet); });
 $("closeTrain").addEventListener("click", closeAll);
-sheetBg.addEventListener("click", () => { closeAll(); });
+sheetBg.addEventListener("click", closeAll);
 
-function renderGrid() {
-  const n = knnLabels.length;
-  $("trainNote").textContent = n < 2
-    ? "Toque numa letra, faça o sinal e mexa a mão de leve enquanto ele grava (uns 3 s). Grave pelo menos 2 letras."
-    : `${n} letras treinadas. Toque numa letra para regravar ou ensinar uma nova.`;
-  $("grid").innerHTML = LIBRAS_LETTERS.map(l => {
-    const c = (samples[l] || []).length;
-    return `<button class="cell${c >= MIN_SAMPLES ? " ok" : ""}" data-l="${l}">${l}<small>${c >= MIN_SAMPLES ? "✓" : ""}</small></button>`;
-  }).join("");
-  $("grid").querySelectorAll(".cell").forEach(b => b.addEventListener("click", () => startRecording(b.dataset.l)));
+function updateSyncNote() {
+  const n = knnLabels.length, pending = gestures.some(g => g.dirty);
+  const base = n < 2
+    ? "Toque numa letra ou crie uma palavra, faça o sinal e mexa a mão de leve enquanto ele grava (uns 3 s). Grave pelo menos 2."
+    : `${n} gestos prontos. Toque num gesto para regravar, apagar ou deixar público.`;
+  const where = user() ? (pending ? " Alguns ainda não subiram para a conta." : " Salvo na sua conta.")
+                       : " Salvo só neste aparelho. Entre na sua conta para guardar e compartilhar.";
+  $("trainNote").textContent = base + where;
 }
-$("wipeData").addEventListener("click", () => {
+function labelState(l) {
+  const gs = gestures.filter(g => g.label === l && (g.samples || []).length >= MIN_SAMPLES);
+  return { ok: gs.length > 0, pub: gs.some(g => g.public && isOwn(g)), copy: gs.length > 0 && gs.every(g => !isOwn(g)) };
+}
+function renderGrid() {
+  updateSyncNote();
+  $("grid").innerHTML = LIBRAS_LETTERS.map(l => {
+    const s = labelState(l);
+    return `<button class="cell${s.ok ? " ok" : ""}" data-l="${l}">${l}<small>${s.pub ? "público" : s.ok ? "✓" : ""}</small></button>`;
+  }).join("");
+  const words = [...new Set(gestures.filter(g => isWord(g.label)).map(g => g.label))];
+  $("words").innerHTML = words.length
+    ? words.map(w => { const s = labelState(w); return `<button class="wchip${s.pub ? " pub" : ""}" data-l="${esc(w).replace(/"/g, "&quot;")}">${esc(w)}${s.pub ? " · público" : s.copy ? " · comunidade" : ""}</button>`; }).join("")
+    : `<span class="empty">Nenhuma palavra ainda.</span>`;
+  document.querySelectorAll("#grid .cell, #words .wchip").forEach(b => b.addEventListener("click", () => {
+    const l = b.dataset.l;
+    labelState(l).ok ? openItem(l) : startRecording(l);
+  }));
+}
+$("newWordForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const l = cleanLabel($("newWord").value);
+  if (!l) return toast("Digite o nome da palavra");
+  if (!isWord(l)) return toast("Para uma letra, use a grade acima");
+  $("newWord").value = ""; startRecording(l);
+});
+
+/* um gesto */
+let itemLabel = null;
+function openItem(l) {
+  itemLabel = l;
+  const gs = gestures.filter(g => g.label === l), own = gs.find(isOwn);
+  const total = gs.reduce((a, g) => a + (g.samples || []).length, 0);
+  $("itemTitle").textContent = l;
+  $("itemNote").textContent = `${total} exemplos gravados${own ? "" : " · adicionado da comunidade"}.`
+    + (user() ? "" : " Entre na sua conta para poder deixar público.");
+  $("itemPublicRow").classList.toggle("hidden", !user() || !own);
+  $("itemPublic").checked = !!own?.public;
+  $("itemDelete").textContent = "Apagar"; delete $("itemDelete").dataset.armed;
+  openSheet2(itemSheet);
+}
+$("itemPublic").addEventListener("change", e => {
+  const g = gestures.find(x => x.label === itemLabel && isOwn(x)); if (!g) return;
+  g.public = e.target.checked; g.dirty = true; saveCache(); pushGesture(g);
+  toast(g.public ? "Agora é público" : "Agora é privado");
+});
+$("itemRedo").addEventListener("click", () => startRecording(itemLabel));
+$("itemDelete").addEventListener("click", async () => {
+  const b = $("itemDelete");
+  if (!b.dataset.armed) { b.dataset.armed = 1; b.textContent = "Toque de novo"; return; }
+  const gone = gestures.filter(g => g.label === itemLabel);
+  gestures = gestures.filter(g => g.label !== itemLabel);
+  saveCache(); rebuildKnn(); renderGrid(); openSheet2(trainSheet); toast(`${itemLabel} apagado`);
+  for (const g of gone) await deleteRemote(g);
+});
+$("itemClose").addEventListener("click", () => { renderGrid(); openSheet2(trainSheet); });
+
+/* comunidade */
+let exploreTimer;
+async function loadExplore() {
+  const list = $("exploreList");
+  if (!user()) { list.innerHTML = `<p class="empty">Entre na sua conta para ver os gestos da comunidade.</p>`; return; }
+  list.innerHTML = `<p class="empty">Carregando…</p>`;
+  const q = cleanLabel($("exploreQ").value);
+  let f = "public = true && alphabet = 'libras' && owner != {:me}";
+  if (q) f += " && label ~ {:q}";
+  try {
+    const res = await pb.collection("gestures").getList(1, 60, {
+      filter: pb.filter(f, { me: user().id, q }), sort: "label,-created", fields: "id,label,kind,author_name",
+    });
+    if (!res.items.length) { list.innerHTML = `<p class="empty">${q ? "Nada encontrado." : "Ainda não há gestos públicos."}</p>`; return; }
+    list.innerHTML = res.items.map(r => {
+      const has = gestures.some(g => g.source === r.id);
+      return `<div class="item"><div><b>${esc(r.label)}</b><small>${r.kind === "letra" ? "Letra" : "Palavra"} · ${esc(r.author_name || "Anônimo")}</small></div>
+        <button class="btn${has ? "" : " add"}" data-id="${r.id}" ${has ? "disabled" : ""}>${has ? "Adicionado" : "Adicionar"}</button></div>`;
+    }).join("");
+    list.querySelectorAll("button[data-id]:not([disabled])").forEach(b => b.addEventListener("click", () => addFromCommunity(b)));
+  } catch (e) { console.warn(e); list.innerHTML = `<p class="empty">Não consegui carregar. Confira a internet.</p>`; }
+}
+async function addFromCommunity(btn) {
+  btn.disabled = true; btn.textContent = "…";
+  try {
+    const r = await pb.collection("gestures").getOne(btn.dataset.id);
+    const g = newGesture(r.label, r.samples, { source: r.id, kind: r.kind });
+    gestures.push(g); saveCache(); rebuildKnn(); pushGesture(g);
+    btn.textContent = "Adicionado"; btn.classList.remove("add"); toast(`${r.label} adicionado`);
+  } catch (e) { console.warn(e); btn.disabled = false; btn.textContent = "Adicionar"; toast("Não deu para adicionar"); }
+}
+$("openExplore").addEventListener("click", () => { openSheet2(exploreSheet); loadExplore(); });
+$("exploreQ").addEventListener("input", () => { clearTimeout(exploreTimer); exploreTimer = setTimeout(loadExplore, 350); });
+$("exploreClose").addEventListener("click", () => { renderGrid(); openSheet2(trainSheet); });
+
+/* exportar, importar, apagar */
+$("wipeData").addEventListener("click", async () => {
   const b = $("wipeData");
-  if (b.dataset.armed) { samples = {}; saveSamples(); rebuildKnn(); renderGrid(); b.textContent = "Apagar tudo"; delete b.dataset.armed; toast("Treino apagado"); }
-  else { b.dataset.armed = 1; b.textContent = "Toque de novo"; setTimeout(() => { b.textContent = "Apagar tudo"; delete b.dataset.armed; }, 2500); }
+  if (!b.dataset.armed) {
+    b.dataset.armed = 1; b.textContent = user() ? "Apaga da conta também" : "Toque de novo";
+    setTimeout(() => { b.textContent = "Apagar tudo"; delete b.dataset.armed; }, 3000); return;
+  }
+  const gone = gestures; gestures = [];
+  saveCache(); rebuildKnn(); renderGrid(); b.textContent = "Apagar tudo"; delete b.dataset.armed; toast("Gestos apagados");
+  for (const g of gone) await deleteRemote(g);
 });
 $("exportData").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({ soletra: 1, alfabeto: "libras", samples })], { type: "application/json" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "soletra-libras.json"; a.click();
+  const data = gestures.map(({ label, kind, samples }) => ({ label, kind, samples }));
+  const blob = new Blob([JSON.stringify({ soletra: 2, alfabeto: "libras", gestures: data })], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "soletra-gestos.json"; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 });
 $("importData").addEventListener("change", async e => {
   const f = e.target.files[0]; if (!f) return;
   try {
     const data = JSON.parse(await f.text());
-    if (!data.samples) throw 0;
-    samples = data.samples; saveSamples(); rebuildKnn(); renderGrid(); toast("Treino importado");
+    const items = Array.isArray(data.gestures) ? data.gestures
+      : data.samples ? Object.entries(data.samples).map(([label, samples]) => ({ label, samples })) : null;
+    if (!items) throw 0;
+    for (const it of items) {
+      const label = cleanLabel(String(it.label || "")); if (!label || !Array.isArray(it.samples)) continue;
+      let g = gestures.find(x => x.label === label && isOwn(x));
+      if (g) { g.samples = it.samples; g.dirty = true; } else { g = newGesture(label, it.samples); gestures.push(g); }
+    }
+    saveCache(); rebuildKnn(); renderGrid(); toast("Gestos importados");
+    if (user()) await sync();
   } catch { toast("Arquivo inválido"); }
   e.target.value = "";
 });
-rebuildKnn(); syncLangUI();
+
+/* início */
+gestures = readCache(null); rebuildKnn(); syncLangUI();
+(async () => {
+  try {
+    await ensurePb();
+    if (user()) {
+      gestures = readCache(user().id); rebuildKnn();
+      try { await pb.collection("users").authRefresh(); } catch (e) { if (e?.status === 401) pb.authStore.clear(); }
+      if (user()) await sync();
+      else { gestures = readCache(null); rebuildKnn(); }
+    }
+  } catch (e) { console.warn("Servidor indisponível, seguindo só no aparelho", e); }
+  updateAccountUI(); renderGrid();
+})();
 
 /* ---------- carregar MediaPipe ---------- */
 async function loadModel() {
@@ -761,7 +1105,7 @@ loadModel().then(() => {
 });
 
 syncSettingsUI(); render();
-window.__soletra = { classify, preprocess, LABELS, knnTest: (S, X) => { samples = S; rebuildKnn(); return X.map(x => { const p = knn(Float32Array.from(x)); return [knnLabels[p.indexOf(Math.max(...p))], Math.max(...p)]; }); } };
+window.__soletra = { classify, preprocess, LABELS, knnTest: (S, X) => { gestures = Object.entries(S).map(([l, v]) => newGesture(l, v)); rebuildKnn(); return X.map(x => { const p = knn(Float32Array.from(x)); return [knnLabels[p.indexOf(Math.max(...p))], Math.max(...p)]; }); } };
 </script>
 </body>
 </html>
