@@ -113,9 +113,10 @@
   .btn.primary{grid-column:span 2;background:var(--text);color:var(--bg);border-color:transparent}
   .btn.ghost{background:transparent;height:44px;font-size:14px;color:#CFCFD8}
 
-  .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translate(-50%,20px);opacity:0;
-    background:var(--text);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;
-    transition:all .25s;z-index:20;pointer-events:none}
+  .toast{position:fixed;left:50%;top:calc(64px + var(--safe-t));transform:translate(-50%,-20px);opacity:0;
+    background:var(--text);color:var(--bg);padding:10px 16px;border-radius:18px;font-size:14px;font-weight:600;
+    max-width:min(92vw,420px);width:max-content;text-align:center;line-height:1.35;
+    transition:all .25s;z-index:60;pointer-events:none}
   .toast.show{opacity:1;transform:translate(-50%,0)}
 
   /* ajustes */
@@ -189,6 +190,22 @@
   .item .btn.add{background:var(--accent);color:var(--accent-ink);border-color:transparent}
   .btn[disabled]{opacity:.55}
 
+  .pill{height:34px;padding:0 14px 0 10px;border-radius:999px;background:var(--accent);color:var(--accent-ink);
+    font:600 13.5px Inter,sans-serif;display:inline-flex;align-items:center;gap:5px}
+  .pill svg{width:15px;height:15px}
+  .label .count{text-transform:none;letter-spacing:0;font-weight:500}
+  .acctrow{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 16px;border-radius:999px;
+    border:1px solid var(--line);background:rgba(255,255,255,.04);font:600 14px Inter,sans-serif;color:var(--text)}
+  .acctrow svg{width:12px;height:12px;flex:none}
+  .acctrow.wide{width:100%;justify-content:space-between;border-radius:14px;margin:-2px 0 12px;border-color:rgba(198,244,50,.45)}
+  .ver{font-size:11.5px;color:var(--muted)}
+  .srv{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+  .srv.ok{color:var(--accent)} .srv.bad{color:var(--warn)}
+  button.hint{background:none;font-family:inherit;padding:0}
+  .hint.cancel{background:rgba(20,20,26,.7);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:8px 14px;
+    font-weight:600;color:#fff;max-width:none}
+  .gate{position:fixed;z-index:10;gap:16px;overflow:auto;padding:calc(28px + var(--safe-t)) 28px calc(28px + var(--safe-b))}
+
   .hidden{display:none!important}
   .fade{opacity:0}
 
@@ -229,9 +246,6 @@
         <button class="iconbtn hidden" id="flip" aria-label="Trocar câmera">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3.2l-1.6-2H8.8L7.2 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2"/><path d="M14.5 9.5v1.7h-1.7M9.5 16.5v-1.7h1.7"/></svg>
         </button>
-        <button class="iconbtn hidden" id="openTrain" aria-label="Treinar letras">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>
-        </button>
         <button class="iconbtn acct" id="accountBtn" aria-label="Conta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.4-3 4-4.5 7-4.5s5.6 1.5 7 4.5"/></svg>
         </button>
@@ -251,7 +265,7 @@
       <div class="core"><span class="letter dim" id="letter">✋</span></div>
     </div>
 
-    <div class="hint" id="hint">Segure a letra até o anel fechar</div>
+    <button class="hint" id="hint">Segure a letra até o anel fechar</button>
 
     <div class="gate" id="gate">
       <h1>Soletre com as mãos</h1>
@@ -266,13 +280,17 @@
       </button>
       <div class="loader" id="loader">Preparando o reconhecimento…</div>
       <p class="err hidden" id="gateErr"></p>
+      <button class="acctrow" id="gateAccount"><span id="gateAccountText">Entrar ou criar conta</span>
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m4.5 3 3 3-3 3"/></svg></button>
+      <div class="ver" id="gateVer"></div>
     </div>
   </section>
 
   <section class="composer" aria-label="Texto formado">
     <header>
-      <span class="label">Texto</span>
-      <span class="count" id="count">0 letras</span>
+      <span class="label">Texto <span class="count" id="count">· 0 letras</span></span>
+      <button class="pill" id="openTrain">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Meus gestos</button>
     </header>
     <div class="paper" id="paper"><div class="text" id="text" aria-live="polite"></div></div>
     <div class="actions">
@@ -310,7 +328,7 @@
     <label class="switch"><span><b style="font-weight:600">Mostrar ranking</b><small>As 3 letras mais prováveis no canto da câmera.</small></span><input type="checkbox" id="showTop"></label>
   </div>
   <button class="btn primary" id="closeSettings" style="width:100%;margin-top:8px">Pronto</button>
-  <p class="note" style="text-align:center;margin:12px 0 0">Versão 0.4 · contas e comunidade</p>
+  <p class="note" style="text-align:center;margin:12px 0 0">Versão 0.5 · contas e gestos</p>
 </div>
 
 <div class="sheet" id="langSheet" role="dialog" aria-modal="true" aria-labelledby="langTitle">
@@ -326,6 +344,8 @@
   <div class="grab"></div>
   <h2 id="trainTitle">Meus gestos</h2>
   <p class="note" id="trainNote"></p>
+  <button class="acctrow wide hidden" id="trainLogin"><span>Entrar para salvar na conta e compartilhar</span>
+    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m4.5 3 3 3-3 3"/></svg></button>
   <div class="sub">Alfabeto</div>
   <div class="grid" id="grid"></div>
   <div class="sub">Palavras</div>
@@ -347,6 +367,10 @@
   <div class="grab"></div>
   <h2 id="itemTitle"></h2>
   <p class="note" id="itemNote"></p>
+  <form class="inline hidden" id="renameForm" autocomplete="off" style="margin-bottom:12px">
+    <input class="input" id="renameInput" maxlength="30" aria-label="Nome do gesto">
+    <button class="btn" type="submit">Renomear</button>
+  </form>
   <div class="field" id="itemPublicRow">
     <label class="switch"><span><b style="font-weight:600">Público</b><small>Outras pessoas podem ver e adicionar este gesto.</small></span><input type="checkbox" id="itemPublic"></label>
   </div>
@@ -385,6 +409,7 @@
     <button class="btn" id="logout" style="width:100%">Sair</button>
   </div>
   <p class="note" style="margin:14px 0 0">Dos gestos, guardamos só os pontos da mão, nunca imagem ou vídeo.</p>
+  <p class="srv" id="srvStatus">Verificando servidor…</p>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -456,7 +481,7 @@ const hold = { cand: null, since: 0, other: null, otherSince: 0, lastCommit: nul
 function esc(s){ return s.replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c])); }
 function render() {
   const letters = text.replace(/\s/g, "").length;
-  els.count.textContent = `${letters} ${letters === 1 ? "letra" : "letras"}`;
+  els.count.textContent = `· ${letters} ${letters === 1 ? "letra" : "letras"}`;
   if (!text) {
     els.text.innerHTML = `<div class="placeholder">Faça uma letra e <b>segure</b> até o anel fechar. Tire a mão da câmera para dar espaço.</div>`;
     return;
@@ -480,14 +505,14 @@ function addSpace() { if (text && !text.endsWith(" ")) { text += " "; lastAdded 
 function backspace() { text = text.slice(0, -1); lastAdded = -1; render(); }
 
 let toastTimer;
-function toast(msg) {
+function toast(msg, ms = 1600) {
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1400);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), ms);
 }
 
 /* ---------- lógica de "segurar para confirmar" ---------- */
 function setRing(p) { els.ring.style.opacity = p > 0.02 ? 1 : 0; els.ring.style.strokeDashoffset = String(RING * (1 - Math.max(0, Math.min(1, p)))); }
-function showLetter(l, dim) { els.letter.textContent = l; els.letter.classList.toggle("dim", !!dim); }
+function showLetter(l, dim) { els.letter.textContent = l; const n = [...l].length; els.letter.style.fontSize = dim || n < 2 ? "" : n < 4 ? "30px" : "15px"; els.letter.style.letterSpacing = n > 1 ? "0" : ""; els.letter.classList.toggle("dim", !!dim); }
 
 function onPrediction(labels, probs, now) {
   if (labels !== curLabels || (smooth && smooth.length !== probs.length)) smooth = null;
@@ -696,7 +721,8 @@ $("showTop").addEventListener("change", e => { settings.showTop = e.target.check
 
 /* ---------- ASL x Libras, gestos e conta ---------- */
 const PB_URL = "https://papi.valecasa.com.br";
-const PB_SDK = "https://cdn.jsdelivr.net/npm/pocketbase@0.28.2/dist/pocketbase.es.mjs";
+const PB_SDK = "./vendor/pocketbase.es.mjs";
+const APP_VERSION = "0.5";
 let curLabels = LABELS;
 let lang = null;
 try { lang = localStorage.getItem("soletra-lang"); } catch {}
@@ -760,6 +786,8 @@ function knn(feat, k = 7) {
 
 function handleHand(feat, now) {
   if (rec.label) return recordFrame(feat, now);
+  // com um painel aberto, não escreve nada por trás
+  if (sheetBg.classList.contains("open")) { smooth = null; hold.cand = null; hold.released = true; setRing(0); return; }
   if (lang === "libras") {
     if (knnLabels.length < 2) { setRing(0); showLetter("✋", true); renderTop3([]); setStatus("Treine pelo menos 2 gestos"); return; }
     return onPrediction(knnLabels, knn(feat), now);
@@ -769,7 +797,16 @@ function handleHand(feat, now) {
 
 /* ---------- gravação ---------- */
 const rec = { label: null, startAt: 0, last: 0, buf: [] };
+function cancelRecording() {
+  if (!rec.label) return;
+  rec.label = null; setRing(0); els.hint.classList.remove("cancel"); els.hint.textContent = "Segure a letra até o anel fechar";
+  renderGrid(); openSheet2(trainSheet);
+}
+els.hint.addEventListener("click", cancelRecording);
 function startRecording(label) {
+  if (!running) { closeAll(); toast("Ative a câmera primeiro"); return; }
+  els.hint.classList.add("cancel"); els.hint.textContent = "Cancelar";
+  smooth = null; hold.cand = null; hold.lastCommit = null;
   rec.label = label; rec.startAt = performance.now() + 1500; rec.buf = []; rec.last = 0;
   closeAll();
   showLetter(isWord(label) ? "●" : label, false); setRing(0);
@@ -783,6 +820,7 @@ function recordFrame(feat, now) {
   setStatus(`Gravando ${rec.label} · ${rec.buf.length}/${SAMPLES_PER_LETTER}`);
   if (rec.buf.length >= SAMPLES_PER_LETTER) {
     const label = rec.label; rec.label = null;
+    els.hint.classList.remove("cancel"); els.hint.textContent = "Segure a letra até o anel fechar";
     let g = gestures.find(x => x.label === label && isOwn(x));
     if (g) { g.samples = rec.buf; g.dirty = true; } else { g = newGesture(label, rec.buf); gestures.push(g); }
     saveCache(); rebuildKnn();
@@ -818,7 +856,7 @@ async function pushGesture(g) {
   } catch (e) {
     console.warn(e);
     if (e?.status === 404) { g.id = null; g.dirty = true; saveCache(); return pushGesture(g); }
-    toast("Sem conexão: salvo só no aparelho por enquanto");
+    toast(e?.status ? `Não salvou na conta ${errDetail(e)}` : "Sem conexão: salvo só no aparelho por enquanto", 4000);
   }
   updateSyncNote();
 }
@@ -845,6 +883,12 @@ async function sync() {
   saveCache(); rebuildKnn(); renderGrid();
 }
 
+function syncError(e) {
+  if (e?.status === 404) return "Login ok, mas a tabela “gestures” não existe no servidor";
+  if (!e?.status) return "Login ok, mas sem conexão para sincronizar";
+  return `Não deu para sincronizar ${errDetail(e)}`;
+}
+
 /* ---------- conta ---------- */
 let signup = false;
 const accountSheet = $("accountSheet");
@@ -859,27 +903,56 @@ function updateAccountUI() {
   $("authSubmit").textContent = signup ? "Criar conta" : "Entrar";
   $("authToggle").textContent = signup ? "Já tem conta? Entrar" : "Não tem conta? Criar conta";
   $("authPass").autocomplete = signup ? "new-password" : "current-password";
+  $("gateAccountText").textContent = u ? `Conta: ${u.name || u.email}` : "Entrar ou criar conta";
+  $("trainLogin").classList.toggle("hidden", !!u);
   updateSyncNote();
 }
-function authError(e) {
-  if (!e || e.status === 0) return "Não consegui falar com o servidor. Confira a internet.";
-  const d = e.response?.data || {};
-  if (signup && d.email) return "Esse e-mail já tem conta ou é inválido.";
-  if (signup && d.password) return "A senha precisa ter pelo menos 8 caracteres.";
-  if (e.status === 400) return signup ? "Confira os dados e tente de novo." : "E-mail ou senha incorretos.";
-  if (e.status === 429) return "Muitas tentativas. Espere um pouco.";
-  return "Algo deu errado. Tente de novo.";
+const HOST = PB_URL.replace(/^https?:\/\//, "");
+function errDetail(e) {
+  const st = e?.status ?? "?", msg = e?.response?.message || e?.originalError?.message || e?.message || "";
+  return `(código ${st}${msg ? ": " + String(msg).slice(0, 90) : ""})`;
 }
-$("accountBtn").addEventListener("click", () => { updateAccountUI(); openSheet2(accountSheet); });
+function authError(e, step) {
+  if (!e || e.status === 0 || e.status === undefined) return `Não consegui falar com o servidor ${HOST}. Confira a internet. ${errDetail(e)}`;
+  const d = e.response?.data || {};
+  if (step === "create") {
+    if (d.email?.code === "validation_not_unique") return "Esse e-mail já tem conta. Toque em “Já tem conta? Entrar”.";
+    if (d.email) return "E-mail inválido.";
+    if (d.password || d.passwordConfirm) return "A senha precisa ter pelo menos 8 caracteres.";
+    if (e.status === 400) return `Não consegui criar a conta. ${errDetail(e)}`;
+    if (e.status === 403 || e.status === 404) return `O servidor não está aceitando novos cadastros. ${errDetail(e)}`;
+  }
+  if (step === "login" && e.status === 400) return "E-mail ou senha incorretos.";
+  if (e.status === 429) return "Muitas tentativas. Espere um pouco.";
+  return `Algo deu errado. ${errDetail(e)}`;
+}
+async function checkServer() {
+  const el = $("srvStatus");
+  try {
+    const r = await fetch(PB_URL + "/api/health", { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    el.textContent = `Servidor ${HOST}: conectado`; el.className = "srv ok"; return true;
+  } catch (e) {
+    el.textContent = `Servidor ${HOST}: sem resposta (${e.message || e})`; el.className = "srv bad"; return false;
+  }
+}
+const openAccount = () => { $("authErr").classList.add("hidden"); updateAccountUI(); openSheet2(accountSheet); checkServer(); };
+$("accountBtn").addEventListener("click", openAccount);
+$("gateAccount").addEventListener("click", openAccount);
+$("trainLogin").addEventListener("click", openAccount);
+$("gateVer").textContent = "Versão " + APP_VERSION;
 $("authToggle").addEventListener("click", () => { signup = !signup; $("authErr").classList.add("hidden"); updateAccountUI(); });
 $("authForm").addEventListener("submit", async e => {
   e.preventDefault();
   const email = $("authEmail").value.trim(), password = $("authPass").value, name = $("authName").value.trim();
   const btn = $("authSubmit"); btn.disabled = true; $("authErr").classList.add("hidden");
+  let step = "load";
   try {
     await ensurePb();
-    if (signup) await pb.collection("users").create({ email, password, passwordConfirm: password, name });
+    if (signup) { step = "create"; await pb.collection("users").create({ email, password, passwordConfirm: password, name }); }
+    step = "login";
     await pb.collection("users").authWithPassword(email, password);
+    step = "sync";
     // o que foi treinado sem conta vai para a conta
     const anon = readCache(null);
     gestures = [...readCache(user().id), ...anon.map(g => ({ ...g, id: null, dirty: true }))];
@@ -887,11 +960,14 @@ $("authForm").addEventListener("submit", async e => {
     $("authPass").value = "";
     updateAccountUI(); closeAll();
     toast(signup ? "Conta criada" : "Bem-vindo de volta");
+    signup = false;
     await sync();
   } catch (err) {
     console.warn(err);
-    $("authErr").textContent = authError(err); $("authErr").classList.remove("hidden");
+    if (step === "sync") toast(syncError(err), 5000);
+    else { $("authErr").textContent = authError(err, step); $("authErr").classList.remove("hidden"); }
   }
+  updateAccountUI(); renderGrid();
   btn.disabled = false;
 });
 $("logout").addEventListener("click", () => {
@@ -900,7 +976,7 @@ $("logout").addEventListener("click", () => {
   updateAccountUI(); closeAll(); toast("Você saiu");
 });
 $("syncNow").addEventListener("click", async () => {
-  try { await sync(); toast("Sincronizado"); } catch (e) { console.warn(e); toast("Não deu para sincronizar"); }
+  try { await sync(); toast("Sincronizado"); } catch (e) { console.warn(e); toast(syncError(e), 5000); }
 });
 
 /* ---------- telas ---------- */
@@ -913,7 +989,6 @@ function closeAll() {
 function syncLangUI() {
   document.querySelectorAll(".choice").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   $("langName").textContent = lang === "libras" ? "Libras" : "ASL";
-  $("openTrain").classList.toggle("hidden", lang !== "libras");
   els.start.textContent = "";
   els.start.insertAdjacentHTML("beforeend", lang ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10l4.5-2.5v9L15 14"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg>Ativar câmera` : "Escolha um alfabeto");
   els.start.disabled = !lang || !landmarker;
@@ -929,7 +1004,10 @@ document.querySelectorAll(".choice").forEach(b => b.addEventListener("click", ()
   if (b.closest("#langSheet")) { closeAll(); toast(lang === "libras" ? "Libras" : "ASL"); }
 }));
 $("langChip").addEventListener("click", () => openSheet2(langSheet));
-$("openTrain").addEventListener("click", () => { renderGrid(); openSheet2(trainSheet); });
+$("openTrain").addEventListener("click", () => {
+  if (lang !== "libras") { setLang("libras"); toast("Modo Libras: usa os seus gestos"); }
+  renderGrid(); openSheet2(trainSheet);
+});
 $("closeTrain").addEventListener("click", closeAll);
 sheetBg.addEventListener("click", closeAll);
 
@@ -981,12 +1059,26 @@ function openItem(l) {
   $("itemPublicRow").classList.toggle("hidden", !user() || !own);
   $("itemPublic").checked = !!own?.public;
   $("itemDelete").textContent = "Apagar"; delete $("itemDelete").dataset.armed;
+  $("renameForm").classList.toggle("hidden", !isWord(l));
+  $("renameInput").value = l;
   openSheet2(itemSheet);
 }
 $("itemPublic").addEventListener("change", e => {
   const g = gestures.find(x => x.label === itemLabel && isOwn(x)); if (!g) return;
   g.public = e.target.checked; g.dirty = true; saveCache(); pushGesture(g);
   toast(g.public ? "Agora é público" : "Agora é privado");
+});
+$("renameForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const nl = cleanLabel($("renameInput").value);
+  if (!nl || nl === itemLabel) return;
+  if (!isWord(nl)) return toast("O nome precisa ter mais de uma letra");
+  if (gestures.some(g => g.label === nl)) return toast("Já existe um gesto com esse nome");
+  const moved = gestures.filter(g => g.label === itemLabel);
+  moved.forEach(g => { g.label = nl; g.kind = "palavra"; g.dirty = true; });
+  itemLabel = nl; saveCache(); rebuildKnn(); renderGrid();
+  $("itemTitle").textContent = nl; toast("Renomeado");
+  moved.forEach(pushGesture);
 });
 $("itemRedo").addEventListener("click", () => startRecording(itemLabel));
 $("itemDelete").addEventListener("click", async () => {
@@ -1106,7 +1198,7 @@ loadModel().then(() => {
 });
 
 syncSettingsUI(); render();
-window.__soletra = { classify, preprocess, LABELS, knnTest: (S, X) => { gestures = Object.entries(S).map(([l, v]) => newGesture(l, v)); rebuildKnn(); return X.map(x => { const p = knn(Float32Array.from(x)); return [knnLabels[p.indexOf(Math.max(...p))], Math.max(...p)]; }); } };
+window.__soletra = { classify, preprocess, LABELS, feed: f => handleHand(Float32Array.from(f), performance.now()), setRunning: v => { running = v; }, state: () => ({ labels: knnLabels.slice(), n: gestures.length, text }) };
 </script>
 </body>
 </html>
